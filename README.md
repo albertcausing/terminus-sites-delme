@@ -1,7 +1,7 @@
 # Terminus Plugin Removing Yourself As Team Member From Other Sites.
 
 At some point, you'll get a massive list of sites on your dashboard 
-because you forget to remove yourself to the team members of the client site. 
+because you forget to remove yourself as team members of the client site. 
 
 ###How to install:
 ```
