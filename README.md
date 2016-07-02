@@ -8,6 +8,7 @@ because you forget to remove yourself as team members from client site.
 2. Filter #1 by membership equals "Team"
 3. Filter #2 by ownership not equals to you
 4. Deassociate membership from resulting sites list
+
 Note: 
 - Sites from organization will be skipped because of Filter #1
 - --cached option will use cached sites list
