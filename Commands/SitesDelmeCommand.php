@@ -62,6 +62,8 @@ class SitesDelmeCommand extends TerminusCommand {
 		// Get sites that you don't own
 		$sites = $this->filterByOwner($sites, $owner_uuid);
 
+		$sites = $this->filterByExcludeList($sites);
+
 		if (count($sites) == 0) {
 			$this->log()->warning('You have no sites.');
 		}
@@ -108,7 +110,8 @@ class SitesDelmeCommand extends TerminusCommand {
 	            '"{member}" is not a valid member.',
 	            array('member' => $this->user['email'])
 	          );
-	        }		
+	        }
+		
 		}
 		
 		$this->log()->info("[+] End\r\n");
@@ -140,7 +143,7 @@ class SitesDelmeCommand extends TerminusCommand {
 		$filtered_sites = array_filter(
 			$sites,
 			function($site) {
-				$memberships    = $site->get('memberships');
+				$memberships = $site->get('memberships');
 				foreach ($memberships as $membership) {
 					if ($membership['name'] == 'Team') {
 						return true;
@@ -150,5 +153,33 @@ class SitesDelmeCommand extends TerminusCommand {
 			}
 		);
 		return $filtered_sites;
+	}
+	/**
+	 * Filters an array of sites by exclude list and --exclude filter
+	 *
+	 * @param Site[] $sites An array of sites to filter by
+	 * @return Site[]
+	 */
+	private function filterByExcludeList($sites, $exclude_list = array()) {
+		
+		$filtered_sites = array_filter(
+			$sites,
+			function($site) {
+				$exclude_merge_list =  $this->exclude_site_list(); 
+				if (!in_array($site->get('name'), $exclude_merge_list)) {
+					return true;
+				}
+				return false;
+			}
+		);
+		return $filtered_sites;
+	}
+	/*
+	* Exclude List 
+	*/
+	private function exclude_site_list($exclude_list=array()) {
+		$predefined_exclude_list = array('pantheon-assets');
+		$exclude_merge_list = array_merge($predefined_exclude_list, $exclude_list);
+		return $exclude_merge_list;
 	}
 }
