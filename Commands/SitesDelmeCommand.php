@@ -13,7 +13,7 @@ use Terminus\Session;
  * @command sites
  */
 class SitesDelmeCommand extends TerminusCommand {
-	public $sites;
+	public $sites, $exclude_list=array();
 	/**
 	 * Report the status of all available sites that you are a team member
 	 *
@@ -41,7 +41,8 @@ class SitesDelmeCommand extends TerminusCommand {
 	 *
 	 * [--cached]
 	 * : Causes the command to return cached sites list instead of retrieving anew
-	 *
+	 * [--exclude]
+	 * : Exclude sites from the list
 	 * @subcommand delme
 	 * @alias dm
 	 */
@@ -61,6 +62,11 @@ class SitesDelmeCommand extends TerminusCommand {
 		
 		// Get sites that you don't own
 		$sites = $this->filterByOwner($sites, $owner_uuid);
+
+
+		if (isset($assoc_args['exclude'])) {
+			$this->exclude_list = explode(',', str_replace(' ','',$assoc_args['exclude']));
+		}
 
 		$sites = $this->filterByExcludeList($sites);
 
@@ -89,13 +95,25 @@ class SitesDelmeCommand extends TerminusCommand {
 			'service_level'   => $site->get('service_level'),
 			'framework'       => $site->get('framework'),
 			'membership'	  => $site->get('membership')['id'],
-			'owner_id'		  => $owner_uuid,
+			'owner_id'	  => $owner_uuid,
 			];
 		}
 		
 		// Output the status data in table format.		
 		$this->output()->outputRecordList($site_rows, $site_labels);
 		
+		// Ask user to proceed 
+		echo "Are you ok with the list or use --exclude='site1,site2'?  Type 'yes' to continue: ";
+		$handle = fopen ("php://stdin","r");
+		$line = fgets($handle);
+		if(trim($line) != 'yes'){
+    			echo "[-] ABORTING!\n";
+    			exit;
+		}
+		fclose($handle);
+		echo "\n"; 
+		echo "Ok here we go...\n";
+
 		// Loop through each site and remove membership
 		foreach ($sites as $site) {
 			$name = $site->get('name');			
@@ -160,12 +178,11 @@ class SitesDelmeCommand extends TerminusCommand {
 	 * @param Site[] $sites An array of sites to filter by
 	 * @return Site[]
 	 */
-	private function filterByExcludeList($sites, $exclude_list = array()) {
-		
+	private function filterByExcludeList($sites) {
 		$filtered_sites = array_filter(
 			$sites,
 			function($site) {
-				$exclude_merge_list =  $this->exclude_site_list(); 
+				$exclude_merge_list =  $this->exclude_site_list($this->exclude_list); 
 				if (!in_array($site->get('name'), $exclude_merge_list)) {
 					return true;
 				}

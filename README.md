@@ -12,6 +12,7 @@ because you forget to remove yourself as team members from client site.
 Note: 
 - Sites from organization will be skipped because of Filter #1
 - --cached option will use cached sites list
+- --exclude='site-name1,site-name2' to retain membership to the listed sites
 
 ###How to install:
 ```
@@ -31,3 +32,7 @@ terminus sites list --team | awk -F'|' '{print $2 "|" $6}' | \
 ```
 
 Thank you.
+
+###Changelog: 08-06-2016
+- Added predefined site 'pantheon-assets' to be excluded from user removal
+- Added --exclude assoc argument, to retain membership to the site
