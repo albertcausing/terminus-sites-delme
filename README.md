@@ -36,3 +36,4 @@ Thank you.
 ###Changelog: 08-06-2016
 - Added predefined site 'pantheon-assets' to be excluded from user removal
 - Added --exclude assoc argument, to retain membership to the site
+- Added prompt to proceed
